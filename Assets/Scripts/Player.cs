@@ -5,28 +5,38 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField]
+    private int _maxLives = 3;
+
+    [SerializeField]
+    private int currentLives;
+
+    [SerializeField]
+    [Range(0f, 5f)]
     private float _movementSpeed = 3.5f;
+
     private float _boundaryX = 9.4f;
     private float _boundaryY = 5.5f;
     private Transform _player;
 
     [SerializeField]
-    private float _fireRate = 0.5f;
+    [Range(0f, 1f)]
+    private float _fireRate = 0.2f;
 
     [SerializeField]
-    private GameObject laserPrefab;
+    private GameObject _laserPrefab;
 
     [SerializeField]
     private Transform _laserOffset;
-
     private bool _canFire;
-    private IEnumerator laserCooldownTimer;
-
+    
 
     // Start is called before the first frame update
     void Start()
     {
+        currentLives = _maxLives;
+
         _player = transform; 
+
         _player.position = new Vector3(0, 0, 0);
 
         _canFire = true;
@@ -72,9 +82,11 @@ public class Player : MonoBehaviour
     }
 
     void Shoot()
-    {  
-        Instantiate(laserPrefab, _laserOffset.position, Quaternion.identity);
+    {
+        Instantiate(_laserPrefab, transform.position + new Vector3(0, 0.7f, 0), Quaternion.identity);
+
         _canFire = false;
+
         StartCoroutine(LaserCoolDownTimer());
     }
 
@@ -82,5 +94,15 @@ public class Player : MonoBehaviour
     {
         yield return new WaitForSeconds(_fireRate);
         _canFire = true;
+    }
+
+    public void Damage()
+    {
+        currentLives--;
+
+        if (currentLives < 1)
+        {
+            Destroy(gameObject);
+        }
     }
 }

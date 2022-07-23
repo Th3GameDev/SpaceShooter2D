@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class Laser : MonoBehaviour
 {
+    [SerializeField]
+    [Range(0f, 10f)]
     private float _LaserSpeed = 8f;
+
     private float _boundaryX = 9.4f;
     private float _boundaryY = 5.5f;
 
