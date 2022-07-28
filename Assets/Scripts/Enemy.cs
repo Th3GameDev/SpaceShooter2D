@@ -10,12 +10,50 @@ public class Enemy : MonoBehaviour
 
     private float _bottomBarrier = -7f;
 
+    /*
+    public Vector3[] _positions;
+    private int _positionSelector;
+    private int _lastSelectedEnemy;
+    private int _initialSpawnPositionCount = 1;
+    Vector3 posTemp;
+    Vector3 _lastPos;
+    */
+
+    /*
+    private void Awake()
+    {
+        _positionSelector = Random.Range(0, _positions.Length + 1);
+
+        for (int i = 0; i < _initialSpawnPositionCount; i++)
+        {
+            if (_positionSelector == _lastSelectedEnemy)
+            {
+                while (_positionSelector == _lastSelectedEnemy)
+                {
+                    _positionSelector = Random.Range(0, _positions.Length);
+                }
+            }
+
+            _lastSelectedEnemy = _positionSelector;
+
+            Vector3 _pos = _positions[_positionSelector]; //Instantiate(_roadPrefabs[_roadSelector], i * _roadOffset, transform.rotation);
+
+            _lastPos = _pos;
+
+            Debug.Log(_pos);
+
+            transform.position = _pos;
+
+            //canSpawnRoad = false;
+        }
+    }
+    */
     // Start is called before the first frame update
     void Start()
     {
-        float startXPos = Random.Range(-8f, 8f);
+        //float startXPos = Random.Range(-8f, 8f);
 
-        transform.position = new Vector3(startXPos, 10f, 0f);
+        //transform.position = new Vector3(startXPos, 10f, 0f);      
     }
 
     // Update is called once per frame
@@ -30,7 +68,7 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.tag == "Player")
         {
