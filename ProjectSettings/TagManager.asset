@@ -7,6 +7,7 @@ TagManager:
   - Enemy
   - Laser
   - SpawnManager
+  - PlayerShield
   layers:
   - Default
   - TransparentFX
@@ -49,4 +50,7 @@ TagManager:
     locked: 0
   - name: Foreground
     uniqueID: 476571027
+    locked: 0
+  - name: TVOverlay
+    uniqueID: 3197325231
     locked: 0

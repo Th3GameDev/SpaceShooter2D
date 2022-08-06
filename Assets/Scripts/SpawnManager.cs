@@ -4,11 +4,19 @@ using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
 {
+    [Header("Enemy Spawning")]
     [SerializeField]
     private GameObject _enemyPrefab;
 
     [SerializeField]
     private GameObject _enemyContainer;
+
+    [Header("PowerUp Spawning")]
+    [SerializeField]
+    private GameObject[] _powerUpPrefabs;
+
+    [SerializeField]
+    private GameObject _powerUpContainer;
 
     private bool _stopSpawning = false;
 
@@ -20,12 +28,14 @@ public class SpawnManager : MonoBehaviour
     private int _initialSpawnPositionCount = 9;
     Vector3 posTemp;
     Vector3 _lastPos;
-    
+
+
 
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(SpawnEnemyRoutine()); 
+        StartCoroutine(SpawnEnemyRoutine());
+        StartCoroutine(SpawnPowerUpRoutine());
     }
 
     // Update is called once per frame
@@ -46,9 +56,22 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
+    IEnumerator SpawnPowerUpRoutine()
+    {
+        float randomTime = Random.Range(10f, 20f);
+
+        while (_stopSpawning == false)
+        {
+            yield return new WaitForSeconds(randomTime);
+
+            int randomPowerUpID = Random.Range(0, 3);
+            GameObject newPowerUp = Instantiate(_powerUpPrefabs[randomPowerUpID], RandomPos(), Quaternion.identity);
+            newPowerUp.transform.parent = _powerUpContainer.transform;
+        }
+    }
+
     public void StopSpawning()
     {
-        //Debug.Log("StopSpawning");
         _stopSpawning = true;
     }
 
@@ -77,8 +100,6 @@ public class SpawnManager : MonoBehaviour
             //Debug.Log(randomPos);
 
             //transform.position = randomPos;
-
-            //canSpawnRoad = false;
         }
 
         return randomPos;

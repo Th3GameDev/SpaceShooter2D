@@ -6,6 +6,10 @@ public class Player : MonoBehaviour
 {
     private SpawnManager _spawnManager;
 
+    [Header("Player Settings")]
+
+    private Transform _player;
+
     [SerializeField]
     private int _maxLives = 3;
 
@@ -13,23 +17,39 @@ public class Player : MonoBehaviour
     private int currentLives;
 
     [SerializeField]
-    [Range(0f, 5f)]
-    private float _movementSpeed = 3.5f;
+    [Range(0f, 10f)]
+    private float _movementSpeed = 5f;
 
     private float _boundaryX = 9.4f;
-    private float _boundaryY = 5.5f;
-    private Transform _player;
+    private float _boundaryY = 3.9f;
 
+    [Header("Shooting Settings")]
     [SerializeField]
     [Range(0f, 1f)]
     private float _fireRate = 0.2f;
 
     [SerializeField]
-    private GameObject _laserPrefab;
+    private GameObject _laserPrefab, tripleShotLaserPrefab;
 
     [SerializeField]
     private Transform _laserOffset;
     private bool _canFire;
+
+    [Header("PowerUps")]
+
+    [SerializeField]
+    private GameObject _playerShieldVisualizer;
+
+    [SerializeField]
+    private bool _isTripleShotActive, _isShieldActive;
+
+    [SerializeField]
+    [Range(0f, 5f)]
+    private float _tripleShotTimeActive = 5f, _SpeedBoostTimeActive = 5f;
+
+    [SerializeField]
+    [Range(0f, 5f)]
+    private float _speedMultiplier = 3.5f;
 
     [Header("TESTING")]
     [Range(0f, 5f)]
@@ -41,15 +61,6 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (_spawnManager != null)
-        {
-            _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
-        }
-        else if (_spawnManager == null)
-        {
-            Debug.LogWarning("Enemy_SpawnManager is Null!");
-        }
-
         currentLives = _maxLives;
 
         _player = transform;
@@ -88,28 +99,46 @@ public class Player : MonoBehaviour
             _player.position = new Vector3(_boundaryX, _player.position.y, 0);
         }
 
+        _player.position = new Vector3(_player.position.x, Mathf.Clamp(_player.position.y, -_boundaryY, _boundaryY), 0);
+
+        /*
         if (_player.position.y >= _boundaryY)
         {
-            _player.position = new Vector3(_player.position.x, -_boundaryY, 0);
+            //_player.position = new Vector3(_player.position.x, -_boundaryY, 0);
+            _player.position = new Vector3(_player.position.x, _boundaryY, 0);
         }
         else if (_player.position.y <= -_boundaryY)
         {
-            _player.position = new Vector3(_player.position.x, _boundaryY, 0);
+            //_player.position = new Vector3(_player.position.x, _boundaryY, 0);
+            _player.position = new Vector3(_player.position.x, -_boundaryY, 0);
         }
+        */
 
         if (Input.GetKeyDown(KeyCode.T))
         {
-            StartCoroutine(BlinkGameObject(gameObject, numberofBlinks, blinkRate));
+            //StartCoroutine(BlinkGameObject(gameObject, numberofBlinks, blinkRate));
+            ActivateSpeedBoost();
+            _isTripleShotActive = true;
         }
+
     }
 
     void Shoot()
     {
-        Instantiate(_laserPrefab, _laserOffset.position, Quaternion.identity);
-
-        _canFire = false;
-
-        StartCoroutine(LaserCoolDownTimer());
+        if (_isTripleShotActive)
+        {
+            _fireRate = 0.5f;
+            Instantiate(tripleShotLaserPrefab, transform.position, Quaternion.identity);
+            _canFire = false;
+            StartCoroutine(LaserCoolDownTimer());
+        }
+        else
+        {
+            _fireRate = 0.3f;
+            Instantiate(_laserPrefab, _laserOffset.position, Quaternion.identity);
+            _canFire = false;
+            StartCoroutine(LaserCoolDownTimer());
+        }
     }
 
     IEnumerator LaserCoolDownTimer()
@@ -140,12 +169,21 @@ public class Player : MonoBehaviour
     }
     public void Damage()
     {
+        if (_isShieldActive)
+        {
+            _isShieldActive = false;
+            _playerShieldVisualizer.SetActive(false);
+            return;
+        }
+
         currentLives--;
 
         StartCoroutine(BlinkGameObject(gameObject, numberofBlinks, blinkRate));
 
         if (currentLives < 1)
         {
+            _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
+
             if (_spawnManager != null)
             {
                 _spawnManager.StopSpawning();
@@ -153,5 +191,35 @@ public class Player : MonoBehaviour
 
             Destroy(gameObject);
         }
-    }   
+    }
+
+    public void ActivateTripleShot()
+    {
+        _isTripleShotActive = true;
+        StartCoroutine(TripleShotPowerUpTimer());
+    }
+
+    public void ActivateSpeedBoost()
+    {
+        _movementSpeed += _speedMultiplier;
+        StartCoroutine(SpeedBoostTimer());
+    }
+
+    public void ActivateShield()
+    {
+        _isShieldActive = true;
+        _playerShieldVisualizer.SetActive(true);
+    }
+
+    IEnumerator TripleShotPowerUpTimer()
+    {
+        yield return new WaitForSeconds(_tripleShotTimeActive);
+        _isTripleShotActive = false;
+    }
+
+    IEnumerator SpeedBoostTimer()
+    {
+        yield return new WaitForSeconds(_SpeedBoostTimeActive);
+        _movementSpeed = 5f;
+    }
 }
