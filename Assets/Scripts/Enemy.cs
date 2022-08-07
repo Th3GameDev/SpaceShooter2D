@@ -10,6 +10,8 @@ public class Enemy : MonoBehaviour
 
     private float _bottomBarrier = -7f;
 
+    private Player _player;
+
     /*
     public Vector3[] _positions;
     private int _positionSelector;
@@ -51,6 +53,8 @@ public class Enemy : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        _player = GameObject.Find("Player").GetComponent<Player>();
+
         //float startXPos = Random.Range(-8f, 8f);
 
         //transform.position = new Vector3(startXPos, 10f, 0f);      
@@ -74,19 +78,22 @@ public class Enemy : MonoBehaviour
         {
             Destroy(gameObject);
 
-            Player player = other.GetComponent<Player>();
-
-            if (player != null)
+            if (_player != null)
             {
-                player.Damage();
+                _player.Damage();
             }
-           
+
         }
         else if (other.tag == "Laser")
-        {           
+        {
             Destroy(gameObject);
 
             Destroy(other.gameObject);
+
+            if (_player != null)
+            {
+                _player.AddScore(10);
+            }
         }
     }
 }

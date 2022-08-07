@@ -5,6 +5,10 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     private SpawnManager _spawnManager;
+    private UIManager _uiManager;
+
+    [SerializeField]
+    private int _score;
 
     [Header("Player Settings")]
 
@@ -35,7 +39,7 @@ public class Player : MonoBehaviour
     private Transform _laserOffset;
     private bool _canFire;
 
-    [Header("PowerUps")]
+    [Header("PowerUps Settings")]
 
     [SerializeField]
     private GameObject _playerShieldVisualizer;
@@ -61,6 +65,19 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
+        _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+
+        if (_spawnManager == null)
+        {
+            Debug.LogError("SpawnManager is Null.");
+        }
+
+        if (_uiManager == null)
+        {
+            Debug.LogError("UIManager is Null.");
+        }
+
         currentLives = _maxLives;
 
         _player = transform;
@@ -114,6 +131,7 @@ public class Player : MonoBehaviour
         }
         */
 
+        //Testing 
         if (Input.GetKeyDown(KeyCode.T))
         {
             //StartCoroutine(BlinkGameObject(gameObject, numberofBlinks, blinkRate));
@@ -180,9 +198,11 @@ public class Player : MonoBehaviour
 
         StartCoroutine(BlinkGameObject(gameObject, numberofBlinks, blinkRate));
 
+        _uiManager.UpdateLivesDisplay(currentLives);
+
         if (currentLives < 1)
         {
-            _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
+            //_spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
 
             if (_spawnManager != null)
             {
@@ -190,6 +210,16 @@ public class Player : MonoBehaviour
             }
 
             Destroy(gameObject);
+        }
+    }
+
+    public void AddScore(int points)
+    {
+        _score += points;
+
+        if (_uiManager != null)
+        {
+            _uiManager.UpdateScore(_score);
         }
     }
 
